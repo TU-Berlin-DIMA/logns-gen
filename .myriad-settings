@@ -1,0 +1,5 @@
+# the data generator name
+MYRIAD_DGEN_NAME = logns-gen
+MYRIAD_DGEN_NS   = LogNSGen
+MYRIAD_OLIGOS_CP = 
+MYRIAD_IS_ARCH64 = True
