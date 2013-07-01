@@ -1,9 +1,8 @@
-@numberofexactvals = 5
+@numberofexactvals = 4
 @numberofbins = 0
 @nullprobability = 0.00
 
-p(X) = 0.0001   for X = { 0 } # [0-1)
-p(X) = 0.0010   for X = { 1 } # [1-11]
-p(X) = 0.0100   for X = { 2 } # [11-111)
-p(X) = 0.1000   for X = { 3 } # [111-1111)
-p(X) = 0.8889   for X = { 4 } # [1111-10000)
+p(X) = 0.0001   for X = { 0 } # [0-100]
+p(X) = 0.0100   for X = { 1 } # [100-10100)
+p(X) = 0.1000   for X = { 2 } # [10100-110100)
+p(X) = 0.8899   for X = { 3 } # [110100-1000000)

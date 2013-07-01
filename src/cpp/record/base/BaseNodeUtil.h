@@ -68,6 +68,25 @@ struct RecordFieldTraits<RecordTraits<LogNSGen::Node>::LEVEL, LogNSGen::Node>
     }
 };
 
+// delay
+template<>
+struct RecordFieldTraits<RecordTraits<LogNSGen::Node>::DELAY, LogNSGen::Node>
+{
+    typedef I16u FieldType;
+    typedef MethodTraits<LogNSGen::Node, FieldType>::RefSetter FieldSetterType;
+    typedef MethodTraits<LogNSGen::Node, FieldType>::RefGetter FieldGetterType;
+
+    static inline FieldSetterType setter()
+    {
+        return static_cast<FieldSetterType>(&LogNSGen::Node::delay);
+    }
+
+    static inline FieldGetterType getter()
+    {
+        return static_cast<FieldGetterType>(&LogNSGen::Node::delay);
+    }
+};
+
 // label
 template<>
 struct RecordFieldTraits<RecordTraits<LogNSGen::Node>::LABEL, LogNSGen::Node>

@@ -39,12 +39,15 @@ public:
     typedef Myriad::ConstRangeProvider< I64u, Node > RangeProvider03Type;
     typedef Myriad::ClusteredValueProvider< I16u, Node, Myriad::CombinedPrFunction<I16u>, RangeProvider03Type > ValueProvider03Type;
     typedef Myriad::FieldSetter< Node, Myriad::RecordTraits<Node>::LEVEL, ValueProvider03Type > SetLevelType;
+    // runtime components for setter `set_delay`
+    typedef Myriad::RandomValueProvider< I16u, Node, Myriad::ConditionalCombinedPrFunction<I16u, I16u>, Myriad::RecordTraits<Node>::LEVEL > ValueProvider04Type;
+    typedef Myriad::FieldSetter< Node, Myriad::RecordTraits<Node>::DELAY, ValueProvider04Type > SetDelayType;
     // runtime components for setter `set_label`
-    typedef Myriad::RandomValueProvider< Enum, Node, Myriad::ConditionalCombinedPrFunction<I16u, Enum>, Myriad::RecordTraits<Node>::LEVEL > ValueProvider04Type;
-    typedef Myriad::FieldSetter< Node, Myriad::RecordTraits<Node>::LABEL, ValueProvider04Type > SetLabelType;
+    typedef Myriad::RandomValueProvider< Enum, Node, Myriad::UniformPrFunction<Enum>, 0 > ValueProvider05Type;
+    typedef Myriad::FieldSetter< Node, Myriad::RecordTraits<Node>::LABEL, ValueProvider05Type > SetLabelType;
     // runtime components for setter `set_parent_id`
-    typedef Myriad::CallbackValueProvider< I64u, Node, BaseNodeSetterChain > ValueProvider05Type;
-    typedef Myriad::FieldSetter< Node, Myriad::RecordTraits<Node>::PARENT_ID, ValueProvider05Type > SetParentIdType;
+    typedef Myriad::CallbackValueProvider< I64u, Node, BaseNodeSetterChain > ValueProvider06Type;
+    typedef Myriad::FieldSetter< Node, Myriad::RecordTraits<Node>::PARENT_ID, ValueProvider06Type > SetParentIdType;
 
     BaseNodeSetterChain(Myriad::BaseSetterChain::OperationMode& opMode, Myriad::RandomStream& random, Myriad::GeneratorConfig& config) :
         Myriad::SetterChain<Node>(opMode, random),
@@ -58,10 +61,12 @@ public:
         _rangeProvider03(0, config.parameter<I64u>("node.sequence.base_cardinality")),
         _valueProvider03(config.function< Myriad::CombinedPrFunction<I16u> >("Pr[node.level]"), _rangeProvider03),
         _setLevel(_valueProvider03),
-        _valueProvider04(config.function< Myriad::ConditionalCombinedPrFunction<I16u, Enum> >("Pr[node.label]")),
-        _setLabel(_valueProvider04),
-        _valueProvider05(*this, &BaseNodeSetterChain::setParentID, 0),
-        _setParentId(_valueProvider05),
+        _valueProvider04(config.function< Myriad::ConditionalCombinedPrFunction<I16u, I16u> >("Pr[node.delay]")),
+        _setDelay(_valueProvider04),
+        _valueProvider05(config.function< Myriad::UniformPrFunction<Enum> >("Pr[node.label]")),
+        _setLabel(_valueProvider05),
+        _valueProvider06(*this, &BaseNodeSetterChain::setParentID, 0),
+        _setParentId(_valueProvider06),
         _logger(Logger::get("node.setter.chain"))
     {
     }
@@ -83,6 +88,7 @@ public:
         me->_setBatchId(recordPtr, me->_random);
         me->_setNodeId(recordPtr, me->_random);
         me->_setLevel(recordPtr, me->_random);
+        me->_setDelay(recordPtr, me->_random);
         me->_setLabel(recordPtr, me->_random);
         me->_setParentId(recordPtr, me->_random);
     }
@@ -105,6 +111,7 @@ public:
         _setBatchId.filterRange(predicate, result);
         _setNodeId.filterRange(predicate, result);
         _setLevel.filterRange(predicate, result);
+        _setDelay.filterRange(predicate, result);
         _setLabel.filterRange(predicate, result);
         _setParentId.filterRange(predicate, result);
 
@@ -133,12 +140,16 @@ protected:
     ValueProvider03Type _valueProvider03;
     SetLevelType _setLevel;
 
-    // runtime components for setter `set_label`
+    // runtime components for setter `set_delay`
     ValueProvider04Type _valueProvider04;
+    SetDelayType _setDelay;
+
+    // runtime components for setter `set_label`
+    ValueProvider05Type _valueProvider05;
     SetLabelType _setLabel;
 
     // runtime components for setter `set_parent_id`
-    ValueProvider05Type _valueProvider05;
+    ValueProvider06Type _valueProvider06;
     SetParentIdType _setParentId;
 
     // Logger instance.

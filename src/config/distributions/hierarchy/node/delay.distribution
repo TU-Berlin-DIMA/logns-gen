@@ -1,0 +1,47 @@
+# configuration for Pr[node.delay]
+# Values denote package shipment delay in days
+@numberofconditions = 4
+
+# case 1: level = 0
+@condition = [0, 1)
+@numberofexactvals = 5
+@numberofbins = 0
+@nullprobability = 0.00
+p(X) = 0.50   for X = { 0 }
+p(X) = 0.30   for X = { 1 }
+p(X) = 0.10   for X = { 2 }
+p(X) = 0.07   for X = { 3 }
+p(X) = 0.03   for X = { 4 }
+
+# case 2: level = 1
+@condition = [1, 2)
+@numberofexactvals = 5
+@numberofbins = 0
+@nullprobability = 0.00
+p(X) = 0.60   for X = { 0 }
+p(X) = 0.20   for X = { 1 }
+p(X) = 0.10   for X = { 2 }
+p(X) = 0.07   for X = { 3 }
+p(X) = 0.03   for X = { 4 }
+
+# case 2: level = 2
+@condition = [2, 3)
+@numberofexactvals = 5
+@numberofbins = 0
+@nullprobability = 0.00
+p(X) = 0.40   for X = { 0 }
+p(X) = 0.40   for X = { 1 }
+p(X) = 0.10   for X = { 2 }
+p(X) = 0.05   for X = { 3 }
+p(X) = 0.05   for X = { 4 }
+
+# case 2: level = 3
+@condition = [3, 4)
+@numberofexactvals = 5
+@numberofbins = 0
+@nullprobability = 0.00
+p(X) = 0.80   for X = { 0 }
+p(X) = 0.10   for X = { 1 }
+p(X) = 0.07   for X = { 2 }
+p(X) = 0.02   for X = { 3 }
+p(X) = 0.01   for X = { 4 }
