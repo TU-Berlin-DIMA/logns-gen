@@ -32,6 +32,7 @@ protected:
         function(new Myriad::UniformPrFunction<I64u>("Pr[node.batch_id]", 1, static_cast<I64u>(parameter<I64u>("node.sequence.cardinality") / parameter<I64u>("node.sequence.base_cardinality") + 1)));
         function(new Myriad::ConditionalCombinedPrFunction<I16u, Enum>("Pr[node.label]", static_cast<String>(parameter<String>("ENV.config-dir") + "/distributions/hierarchy/node/label.distribution")));
         function(new Myriad::CombinedPrFunction<I16u>("Pr[node.level]", static_cast<String>(parameter<String>("ENV.config-dir") + "/distributions/hierarchy/node/level.distribution")));
+        function(new Myriad::UniformPrFunction<I64u>("Pr[node.node_id]", 1, static_cast<I64u>(parameter<I64u>("node.sequence.cardinality") + 1)));
     }
 
     virtual void configureSets()

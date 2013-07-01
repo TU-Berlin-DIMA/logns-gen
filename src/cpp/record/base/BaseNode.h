@@ -35,6 +35,9 @@ public:
         return _meta;
     }
 
+    void nodeId(const I64u& v);
+    const I64u& nodeId() const;
+
     void batchId(const I64u& v);
     const I64u& batchId() const;
 
@@ -51,6 +54,7 @@ public:
 protected:
 
     // fields
+    I64u _node_id;
     I64u _batch_id;
     I16u _level;
     Enum _label;
@@ -59,6 +63,16 @@ protected:
     // meta
     const NodeMeta& _meta;
 };
+
+inline void BaseNode::nodeId(const I64u& v)
+{
+    _node_id = v;
+}
+
+inline const I64u& BaseNode::nodeId() const
+{
+    return _node_id;
+}
 
 inline void BaseNode::batchId(const I64u& v)
 {
@@ -128,7 +142,7 @@ struct RecordTraits<LogNSGen::Node>
     typedef LogNSGen::NodeSetterChain SetterChainType;
     typedef RecordFactory<LogNSGen::Node> FactoryType;
 
-    enum Field { UNKNOWN, GEN_ID, BATCH_ID, LEVEL, LABEL, PARENT_ID };
+    enum Field { UNKNOWN, GEN_ID, NODE_ID, BATCH_ID, LEVEL, LABEL, PARENT_ID };
 };
 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
@@ -140,11 +154,13 @@ inline void AbstractOutputCollector<LogNSGen::BaseNode>::serialize(std::ostream&
 {
     write(out, record.batchId(), false);
     out << '|';
-    write(out, record.level(), false);
+    write(out, record.nodeId(), false);
     out << '|';
     write(out, record.labelEnumValue(), false);
     out << '|';
     write(out, record.parentId(), false);
+    out << '|';
+    write(out, record.level(), false);
     out << '|';
     out << '\n';
 }

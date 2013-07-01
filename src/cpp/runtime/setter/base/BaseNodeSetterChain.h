@@ -31,16 +31,20 @@ public:
     typedef Myriad::ConstRangeProvider< I64u, Node > RangeProvider01Type;
     typedef Myriad::ClusteredValueProvider< I64u, Node, Myriad::UniformPrFunction<I64u>, RangeProvider01Type > ValueProvider01Type;
     typedef Myriad::FieldSetter< Node, Myriad::RecordTraits<Node>::BATCH_ID, ValueProvider01Type > SetBatchIdType;
-    // runtime components for setter `set_level`
+    // runtime components for setter `set_node_id`
     typedef Myriad::ConstRangeProvider< I64u, Node > RangeProvider02Type;
-    typedef Myriad::ClusteredValueProvider< I16u, Node, Myriad::CombinedPrFunction<I16u>, RangeProvider02Type > ValueProvider02Type;
-    typedef Myriad::FieldSetter< Node, Myriad::RecordTraits<Node>::LEVEL, ValueProvider02Type > SetLevelType;
+    typedef Myriad::ClusteredValueProvider< I64u, Node, Myriad::UniformPrFunction<I64u>, RangeProvider02Type > ValueProvider02Type;
+    typedef Myriad::FieldSetter< Node, Myriad::RecordTraits<Node>::NODE_ID, ValueProvider02Type > SetNodeIdType;
+    // runtime components for setter `set_level`
+    typedef Myriad::ConstRangeProvider< I64u, Node > RangeProvider03Type;
+    typedef Myriad::ClusteredValueProvider< I16u, Node, Myriad::CombinedPrFunction<I16u>, RangeProvider03Type > ValueProvider03Type;
+    typedef Myriad::FieldSetter< Node, Myriad::RecordTraits<Node>::LEVEL, ValueProvider03Type > SetLevelType;
     // runtime components for setter `set_label`
-    typedef Myriad::RandomValueProvider< Enum, Node, Myriad::ConditionalCombinedPrFunction<I16u, Enum>, Myriad::RecordTraits<Node>::LEVEL > ValueProvider03Type;
-    typedef Myriad::FieldSetter< Node, Myriad::RecordTraits<Node>::LABEL, ValueProvider03Type > SetLabelType;
+    typedef Myriad::RandomValueProvider< Enum, Node, Myriad::ConditionalCombinedPrFunction<I16u, Enum>, Myriad::RecordTraits<Node>::LEVEL > ValueProvider04Type;
+    typedef Myriad::FieldSetter< Node, Myriad::RecordTraits<Node>::LABEL, ValueProvider04Type > SetLabelType;
     // runtime components for setter `set_parent_id`
-    typedef Myriad::CallbackValueProvider< I16u, Node, BaseNodeSetterChain > ValueProvider04Type;
-    typedef Myriad::FieldSetter< Node, Myriad::RecordTraits<Node>::PARENT_ID, ValueProvider04Type > SetParentIdType;
+    typedef Myriad::CallbackValueProvider< I64u, Node, BaseNodeSetterChain > ValueProvider05Type;
+    typedef Myriad::FieldSetter< Node, Myriad::RecordTraits<Node>::PARENT_ID, ValueProvider05Type > SetParentIdType;
 
     BaseNodeSetterChain(Myriad::BaseSetterChain::OperationMode& opMode, Myriad::RandomStream& random, Myriad::GeneratorConfig& config) :
         Myriad::SetterChain<Node>(opMode, random),
@@ -48,13 +52,16 @@ public:
         _rangeProvider01(0, config.parameter<I64u>("node.sequence.cardinality")),
         _valueProvider01(config.function< Myriad::UniformPrFunction<I64u> >("Pr[node.batch_id]"), _rangeProvider01),
         _setBatchId(_valueProvider01),
-        _rangeProvider02(0, config.parameter<I64u>("node.sequence.base_cardinality")),
-        _valueProvider02(config.function< Myriad::CombinedPrFunction<I16u> >("Pr[node.level]"), _rangeProvider02),
-        _setLevel(_valueProvider02),
-        _valueProvider03(config.function< Myriad::ConditionalCombinedPrFunction<I16u, Enum> >("Pr[node.label]")),
-        _setLabel(_valueProvider03),
-        _valueProvider04(*this, &BaseNodeSetterChain::setParentID, 0),
-        _setParentId(_valueProvider04),
+        _rangeProvider02(0, config.parameter<I64u>("node.sequence.cardinality")),
+        _valueProvider02(config.function< Myriad::UniformPrFunction<I64u> >("Pr[node.node_id]"), _rangeProvider02),
+        _setNodeId(_valueProvider02),
+        _rangeProvider03(0, config.parameter<I64u>("node.sequence.base_cardinality")),
+        _valueProvider03(config.function< Myriad::CombinedPrFunction<I16u> >("Pr[node.level]"), _rangeProvider03),
+        _setLevel(_valueProvider03),
+        _valueProvider04(config.function< Myriad::ConditionalCombinedPrFunction<I16u, Enum> >("Pr[node.label]")),
+        _setLabel(_valueProvider04),
+        _valueProvider05(*this, &BaseNodeSetterChain::setParentID, 0),
+        _setParentId(_valueProvider05),
         _logger(Logger::get("node.setter.chain"))
     {
     }
@@ -74,6 +81,7 @@ public:
 
         // apply setter chain
         me->_setBatchId(recordPtr, me->_random);
+        me->_setNodeId(recordPtr, me->_random);
         me->_setLevel(recordPtr, me->_random);
         me->_setLabel(recordPtr, me->_random);
         me->_setParentId(recordPtr, me->_random);
@@ -95,6 +103,7 @@ public:
 
         // apply inverse setter chain, setters are applied in the same order
         _setBatchId.filterRange(predicate, result);
+        _setNodeId.filterRange(predicate, result);
         _setLevel.filterRange(predicate, result);
         _setLabel.filterRange(predicate, result);
         _setParentId.filterRange(predicate, result);
@@ -102,7 +111,7 @@ public:
         return result;
     }
 
-    virtual I16u setParentID(const AutoPtr<Node>& recordPtr, Myriad::RandomStream& random) = 0;
+    virtual I64u setParentID(const AutoPtr<Node>& recordPtr, Myriad::RandomStream& random) = 0;
 
 protected:
 
@@ -114,17 +123,22 @@ protected:
     ValueProvider01Type _valueProvider01;
     SetBatchIdType _setBatchId;
 
-    // runtime components for setter `set_level`
+    // runtime components for setter `set_node_id`
     RangeProvider02Type _rangeProvider02;
     ValueProvider02Type _valueProvider02;
+    SetNodeIdType _setNodeId;
+
+    // runtime components for setter `set_level`
+    RangeProvider03Type _rangeProvider03;
+    ValueProvider03Type _valueProvider03;
     SetLevelType _setLevel;
 
     // runtime components for setter `set_label`
-    ValueProvider03Type _valueProvider03;
+    ValueProvider04Type _valueProvider04;
     SetLabelType _setLabel;
 
     // runtime components for setter `set_parent_id`
-    ValueProvider04Type _valueProvider04;
+    ValueProvider05Type _valueProvider05;
     SetParentIdType _setParentId;
 
     // Logger instance.

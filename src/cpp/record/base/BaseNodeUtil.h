@@ -11,6 +11,25 @@ namespace Myriad {
 // record field inspection structures
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
+// node_id
+template<>
+struct RecordFieldTraits<RecordTraits<LogNSGen::Node>::NODE_ID, LogNSGen::Node>
+{
+    typedef I64u FieldType;
+    typedef MethodTraits<LogNSGen::Node, FieldType>::RefSetter FieldSetterType;
+    typedef MethodTraits<LogNSGen::Node, FieldType>::RefGetter FieldGetterType;
+
+    static inline FieldSetterType setter()
+    {
+        return static_cast<FieldSetterType>(&LogNSGen::Node::nodeId);
+    }
+
+    static inline FieldGetterType getter()
+    {
+        return static_cast<FieldGetterType>(&LogNSGen::Node::nodeId);
+    }
+};
+
 // batch_id
 template<>
 struct RecordFieldTraits<RecordTraits<LogNSGen::Node>::BATCH_ID, LogNSGen::Node>

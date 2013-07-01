@@ -20,6 +20,10 @@
       <argument key='x_min' type='I64u' value='1' />
       <argument key='x_max' type='I64u' value='${%node.sequence.cardinality% / %node.sequence.base_cardinality% + 1}' />
     </function>
+    <function key="Pr[node.node_id]" type="uniform_probability[I64u]">
+      <argument key='x_min' type='I64u' value='1' />
+      <argument key='x_max' type='I64u' value='${%node.sequence.cardinality% + 1}' />
+    </function>
     <function key="Pr[node.level]" type="combined_probability[I16u]">
       <argument key='path' type='String' value='${%ENV.config-dir% + "/distributions/hierarchy/node/level.distribution"}' />
     </function>
@@ -47,6 +51,7 @@
         <!--  * core types: Bool, Char, Decimal, Date, I16, I16u, I32, I32u, I64, I64u, String -->
         <!--  * enum types: Enum, with an additional enumref='{enum_set.key}' attribute        -->
         <!--  * ref. types: all record_sequence keys defined in this XML document              -->
+        <field name='node_id' type='I64u' />
         <field name='batch_id' type='I64u' />
         <field name='level' type='I16u' />
         <field name='label' type='Enum' enumref='node.label' />
@@ -56,15 +61,26 @@
         <argument key='quoted' type='Bool' value='false' />
         <argument key='delimiter' type='Char' value='|' />
         <argument key='field' type='field_ref' ref='node:batch_id' />
-        <argument key='field' type='field_ref' ref='node:level' />
+        <argument key='field' type='field_ref' ref='node:node_id' />
         <argument key='field' type='field_ref' ref='node:label' />
         <argument key='field' type='field_ref' ref='node:parent_id' />
+        <argument key='field' type='field_ref' ref='node:level' />
       </output_format>
       <setter_chain>
         <setter key='set_batch_id' type='field_setter'>
           <argument key='field' type='field_ref' ref='node:batch_id' />
           <argument key='value' type='clustered_value_provider[I64u]'>
             <argument key='probability' type='function_ref' ref='Pr[node.batch_id]' />
+            <argument key='cardinality' type='const_range_provider[I64u]'>
+              <argument key='min' type='I64u' value='0' />
+              <argument key='max' type='I64u' value='%node.sequence.cardinality%' />
+            </argument>
+          </argument>
+        </setter>
+        <setter key='set_node_id' type='field_setter'>
+          <argument key='field' type='field_ref' ref='node:node_id' />
+          <argument key='value' type='clustered_value_provider[I64u]'>
+            <argument key='probability' type='function_ref' ref='Pr[node.node_id]' />
             <argument key='cardinality' type='const_range_provider[I64u]'>
               <argument key='min' type='I64u' value='0' />
               <argument key='max' type='I64u' value='%node.sequence.cardinality%' />
@@ -90,7 +106,7 @@
         </setter>
         <setter key='set_parent_id' type='field_setter'>
           <argument key='field' type='field_ref' ref='node:parent_id' />
-          <argument key='value' type='callback_value_provider[I16u]'>
+          <argument key='value' type='callback_value_provider[I64u]'>
             <argument key='name' type='String' value='setParentID' />
             <argument key='arity' type='I16u' value='0' />
           </argument>
